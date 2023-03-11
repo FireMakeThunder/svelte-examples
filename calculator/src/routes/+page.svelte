@@ -2,50 +2,59 @@
   import "../app.css";
   import { shrink } from "$lib/shrink";
   import { createOperation } from "$lib/stores/operation";
-    import { Operators } from "$lib/stores/operator";
+	import { numpadNumber, registerCallback } from "$lib/keydown-listeners";
+  
+
+  function register() {
+
+  }
 
   let currentOperation = createOperation();
   $: ({currentEntry, previousEntry} = $currentOperation);
 
-  function keydown(event: KeyboardEvent) {
-    switch (event.code) {
-      case "Enter":
-      case "NumpadEnter":
-        return currentOperation.equals();
+  registerCallback(['Backspace'], () => {
+    currentEntry.backspace()
+    currentEntry.get()
+  });
 
-      case "Escape":
-        return currentOperation.clear();
 
-      case "Delete":
-        return currentEntry.clear();
+  //   switch (event.code) {
+  //     case "Enter":
+  //     case "NumpadEnter":
+  //       click('equals');
+  //       // return currentOperation.equals();
 
-      case "Backspace":
-        return currentEntry.backspace();
-    }
+  //     case "Escape":
+  //       return currentOperation.clear();
 
-    // Handle Numpad keys
-    if (event.code.includes("Numpad")) {
-      const suffix = event.code.replace("Numpad", "").toLowerCase();
+  //     case "Delete":
+  //       return currentEntry.clear();
 
-      if (suffix in Operators) {
-        // console.log("operator", suffix);
-        return currentOperation[suffix as keyof Operators]();
-      }
+  //     case "Backspace":
+  //       return currentEntry.backspace();
+  //   }
 
-      if (suffix === "Decimal") {
-        // console.log("decimal", suffix);
-        return currentOperation.decimal();
-      }
+  //   // Handle Numpad keys
+  //   if (event.code.includes("Numpad")) {
+  //     const suffix = event.code.replace("Numpad", "").toLowerCase();
 
-      if (Number.isInteger(parseInt(suffix))) {
-        // console.log("number", suffix);
-        return currentEntry.append(suffix);
-      }
-    }
-  }
+  //     if (suffix in Operators) {
+  //       // console.log("operator", suffix);
+  //       return currentOperation[suffix as keyof Operators]();
+  //     }
+
+  //     if (suffix === "decimal") {
+  //       return currentEntry.decimal();
+  //     }
+
+  //     if (Number.isInteger(parseInt(suffix))) {
+  //       // console.log("number", suffix);
+  //       console.log(document.querySelector(`button[name="number-${suffix}"]`));
+  //       return currentEntry.append(suffix);
+  //     }
+  //   }
+  // }
 </script>
-
-<svelte:window on:keydown={keydown} />
 
 <main class="p-1 grid items-end h-full grid-rows-[minmax(0,1fr)_auto]">
   <section id="top" class="grid grid-rows-2 text-right pb-1 px-2.5">
@@ -65,37 +74,38 @@
 
   <article id="calculator">
     <section id="actions" class="grid grid-cols-3">
-      <button name="all-clear" on:click={currentOperation.clear}>AC</button>
-      <button name="negate" on:click={currentEntry.negate}>±</button>
-      <button name="percent" on:click={currentEntry.percentage}>%</button>
+      <button on:click={currentOperation.clear} use:register={['Escape']}>AC</button>
+      <button on:click={currentEntry.negate}>±</button>
+      <button on:click={currentEntry.percentage}>%</button>
     </section>
 
     <section id="numbers" class="grid grid-cols-3">
-      {#each "789456123".split("") as number}
+      {#each '789456123'.split('') as str}
+        {@const number = parseInt(str)}
         <button
-          name="number-{number}"
           class="aspect-square"
           on:click={() => currentEntry.append(number)}
+          use:register={[numpadNumber(number), number]}
         >
           {number}
         </button>
       {/each}
       <button
-        name="number-0"
         class="grid grid-cols-2 col-span-2"
         on:click={() => currentEntry.append(0)}
+        use:register={[numpadNumber(0), 0]}
       >
         0
       </button>
-      <button name="decimal" on:click={currentEntry.decimal}>.</button>
+      <button on:click={currentEntry.decimal} use:register={['NumpadDecimal', '.']}>.</button>
     </section>
 
     <section id="operators" class="grid grid-rows-5">
-      <button name="divide" on:click={currentOperation.divide}>÷</button>
-      <button name="multiply" on:click={currentOperation.multiply}>×</button>
-      <button name="subtract" on:click={currentOperation.subtract}>=</button>
-      <button name="add" on:click={currentOperation.add}>+</button>
-      <button name="equal" on:click={currentOperation.equals}>=</button>
+      <button on:click={currentOperation.divide} use:register={['NumpadDivide']}>÷</button>
+      <button on:click={currentOperation.multiply} use:register={['NumpadMultiply']}>×</button>
+      <button on:click={currentOperation.subtract} use:register={['NumpadSubtract']}>=</button>
+      <button on:click={currentOperation.add} use:register={['NumpadAdd']}>+</button>
+      <button on:click={currentOperation.equals} use:register={['NumpadEnter', 'Enter']}>=</button>
     </section>
   </article>
 </main>
