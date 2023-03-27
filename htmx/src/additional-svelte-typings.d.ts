@@ -15,9 +15,14 @@ declare namespace svelteHTML {
 
     // HTMX Core Attributes
     /** 
-      * https://htmx.org/attributes/hx-boost/
+     * The hx-boost attribute allows you to "boost" normal anchors and form tags to use AJAX instead. This has the nice fallback that, if the user does not have javascript enabled, the site will continue to work.
+    
+     * For anchor tags, clicking on the anchor will issue a GET request to the url specified in the href and will push the url so that a history entry is created. The target is the <body> tag, and the innerHTML swap strategy is used by default. All of these can be modified by using the appropriate attributes, except the click trigger.
+    
+    * For forms the request will be converted into a GET or POST, based on the method in the method attribute and will be triggered by a submit. Again, the target will be the body of the page, and the innerHTML swap will be used. The url will not be pushed, however, and no history entry will be created. (You can use the hx-push-url attribute if you want the url to be pushed.)
       * 
-      */
+      * https://htmx.org/attributes/hx-boost/
+    */
     "hx-boost"?: "true" | "false";
     /** 
       * https://htmx.org/attributes/hx-get/
@@ -55,12 +60,18 @@ declare namespace svelteHTML {
       */
     "hx-swap-oob"?: string;
     /** 
-      * https://htmx.org/attributes/hx-swap-target/
-      * 
+     * The hx-target attribute allows you to target a different element for swapping than the one issuing the AJAX request. The value of this attribute can be:
+    
+     ** a CSS query selector of the element to target
+     ** this which indicates that the element that the hx-target attribute is on is the target
+     ** closest <CSS selector> which will find the closest parent ancestor that matches the given CSS selector. (e.g. closest tr will target the closest table row to the element)
+     ** find <CSS selector> which will find the first child descendant element that matches the given CSS selector. (e.g find tr will target the first child descendant row to the element)
+     * 
+     * https://htmx.org/attributes/hx-target/
       */
     "hx-target"?: string;
     /** 
-      * https://htmx.org/attributes/hx-target/
+      * https://htmx.org/attributes/hx-trigger/
       * 
       */
     "hx-trigger"?: string;
@@ -73,8 +84,13 @@ declare namespace svelteHTML {
 
     // HTMX Additional Attributes
     /** 
-      * https://htmx.org/attributes/hx-confirm/
+      * The hx-confirm attribute allows you to confirm an action before issuing a request. This can be useful in cases where the action is destructive and you want to ensure that the user really wants to do it.
       * 
+      * @example <button hx-delete="/account" hx-confirm="Are you sure you wish to delete your account?">
+      * Delete My Account
+      * </button>
+      * 
+      * https://htmx.org/attributes/hx-confirm/
       */
     "hx-confirm"?: string;
     /** 

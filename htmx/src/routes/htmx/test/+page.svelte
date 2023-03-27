@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-  import { spring }  from 'svelte/motion';
+	import { spring }  from 'svelte/motion';
 
   const a = spring(0);
   setTimeout(() => $a = 100, 0);
