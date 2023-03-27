@@ -15,6 +15,6 @@ npm run dev
   - autoprefixer
   - postcss-nested
 - typescript
--
+- prettier
 
 > powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).

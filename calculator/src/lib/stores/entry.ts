@@ -1,20 +1,19 @@
-import { writable } from "svelte/store";
 import type { Operators } from "./operator";
+import { writableExtra } from "$lib/stores/simple";
 
 export type EntryStore = ReturnType<typeof createEntryStore>;
 
 export function createEntryStore() {
-  let entry = '0';
-  const store = writable(entry);
+  const store = writableExtra('0')
+    .transformBefore(value => String(value) || '0');
 
+  let $value;
+  store.subscribe(value => $value = value);
+
+  store.transformBefore(value => String(value) || '0');
+  
   /** Set value and inform subscribers */
-  function set(value: string | number) {
-    // Parse value to make sure it works as a number
-    // Provide 0 as a fallback
-    const newValue = Number(value) || '0';
-
-    store.set(entry = String(newValue));
-  }
+  let entry = '0';
 
   const operations = {
     add(val: number | string) {
@@ -32,20 +31,14 @@ export function createEntryStore() {
   } as const satisfies Record<Lowercase<keyof Operators>, (val: number | string) => number>
 
   return {
-    subscribe: store.subscribe,
-    set,
+    ...store,
     ...operations,
-    percentage() {
-      set(Number(entry) * 0.01);
+    clear() {
+      store.set('');
     },
-
-    negate() {
-      set(Number(entry) * -1);
-    },
-
     decimal() {
       if (entry.includes('.') === false) {
-        set(entry.concat('.'));
+        store.set(entry + '.');
       }
     },
 
@@ -55,7 +48,7 @@ export function createEntryStore() {
         ? entry + payload
         : payload;
 
-      set(newValue);
+      store.set(newValue);
     },
 
     backspace() {
@@ -63,7 +56,7 @@ export function createEntryStore() {
     },
 
     clear() {
-      set('');
+      set('0');
     },
 
 

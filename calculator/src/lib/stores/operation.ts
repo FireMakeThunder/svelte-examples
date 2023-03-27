@@ -3,6 +3,8 @@ import { createEntryStore, type EntryStore } from "./entry";
 import { createOperatorStore } from "./operator";
 
 export function createOperation() {
+  const left = '0';
+  const right = '0'
   const left = createEntryStore();
   const right = createEntryStore();
   const operator = createOperatorStore();
